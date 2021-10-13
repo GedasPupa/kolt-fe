@@ -1,0 +1,11 @@
+.footer-link {
+  text-decoration: none;
+}
+
+.footer-soc-icon {
+  transition: transform .4s ease-in-out;
+}
+
+.footer-soc-icon:hover {
+  transform: rotate(360deg); transition: 0.5s;
+}
