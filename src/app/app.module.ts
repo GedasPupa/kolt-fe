@@ -9,6 +9,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { RouterModule } from '@angular/router';
 import { ScootersComponent } from './components/scooters/scooters.component';
+import { ScooterComponent } from './components/scooter/scooter.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { ScootersComponent } from './components/scooters/scooters.component';
     HeaderComponent,
     FooterComponent,
     ScootersComponent,
+    ScooterComponent,
   ],
   imports: [
     BrowserModule,
@@ -25,6 +27,8 @@ import { ScootersComponent } from './components/scooters/scooters.component';
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'scooters', component: ScootersComponent },
+      { path: 'scooters/:id', component: ScooterComponent },
+      { path: 'add', component: ScooterComponent },
       { path: '**', redirectTo: '', pathMatch: 'full' },
     ]),
   ],

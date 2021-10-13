@@ -6,16 +6,16 @@
 <table class='table' *ngIf="filteredScooters.length > 0; else noScootersWarning">
   <thead>
     <tr>
-      <th>Reg.Code <i (click)="onSort('registration_code')" class="fa fa-angle-{{this.field === 'name' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
-      <th>Busy <i (click)="onSort('is_busy')" class="fa fa-angle-{{this.field === 'weight' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
-      <th>Date <i (click)="onSort('last_use_time')" class="fa fa-angle-{{this.field === 'total_milk' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
-      <th>Kilometers <i (click)="onSort('total_ride_kilometers')" class="fa fa-angle-{{this.field === 'last_milk_time' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Reg.Code <i (click)="onSort('registration_code')" class="fa fa-angle-{{this.field === 'registration_code' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Busy <i (click)="onSort('is_busy')" class="fa fa-angle-{{this.field === 'is_busy' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Date <i (click)="onSort('last_use_time')" class="fa fa-angle-{{this.field === 'last_use_time' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Kilometers <i (click)="onSort('total_ride_kilometers')" class="fa fa-angle-{{this.field === 'total_ride_kilometers' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let item of filteredScooters">
-      <td><a [routerLink]="['/cows', item.id]">{{item.registration_code}}</a></td>
+      <td><a [routerLink]="['/scooters', item.id]">{{item.registration_code}}</a></td>
       <td><i class="fa {{item.is_busy ? 'fa-check' : 'fa-battery-full '}}" aria-hidden="true"></i></td>
       <td>{{item.last_use_time | date }}</td>
       <td>{{item.total_ride_kilometers}}</td>

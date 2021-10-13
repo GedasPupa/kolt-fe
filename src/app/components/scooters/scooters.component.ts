@@ -79,7 +79,7 @@ export class ScootersComponent implements OnInit {
   getScootersSum() {
     this._scootersService.getRecordsSum().subscribe(
       (res) => {
-        this.total_records = res.total_records;
+        this.total_records = res.total_scooters;
         this.recordsLoaded = true;
       },
       (err) => console.log(err)
