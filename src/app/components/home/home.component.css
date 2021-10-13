@@ -1,0 +1,21 @@
+body {
+
+  text-align: right;
+
+ }
+
+ p {
+   width: 500px;
+ }
+
+ body p {
+
+  text-align: center;
+
+ }
+
+ p {
+
+  text-align: left;
+
+ }
