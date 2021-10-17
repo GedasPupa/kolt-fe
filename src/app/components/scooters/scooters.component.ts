@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { ScootersService } from './../../services/scooters.service';
 import { Component, OnInit } from '@angular/core';
 import { IScooter } from 'src/app/models/Scooter';
@@ -52,7 +53,9 @@ import { IScooter } from 'src/app/models/Scooter';
   ],
 })
 export class ScootersComponent implements OnInit {
-  constructor(private _scootersService: ScootersService) {}
+  constructor(private _scootersService: ScootersService, private _router: Router) {
+    this.stateError = this._router.getCurrentNavigation()?.extras.state?.error;
+  }
   scooters: IScooter[] = [];
   filteredScooters: IScooter[] = [];
   field: string = '';
@@ -61,8 +64,12 @@ export class ScootersComponent implements OnInit {
   total_records: number = 0;
   total_kilometers: number = 0;
   recordsLoaded: boolean = false;
+  stateError: any = undefined;
 
   ngOnInit() {
+    if (this.stateError) {
+      alert(`${this.stateError} Please choose scooter from a list.`);
+    }
     this._scootersService.getAllScooters().subscribe(
       (res) => {
         this.scooters = res;

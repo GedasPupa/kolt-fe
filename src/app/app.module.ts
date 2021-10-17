@@ -1,3 +1,4 @@
+import { ScooterGuard } from './guards/scooter.guard';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -27,7 +28,7 @@ import { ScooterComponent } from './components/scooter/scooter.component';
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'scooters', component: ScootersComponent },
-      { path: 'scooters/:id', component: ScooterComponent },
+      { path: 'scooters/:id', canActivate: [ScooterGuard], component: ScooterComponent },
       { path: 'add', component: ScooterComponent },
       { path: '**', redirectTo: '', pathMatch: 'full' },
     ]),
