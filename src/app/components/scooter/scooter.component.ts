@@ -7,16 +7,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-scooter',
   template: `
-  <p *ngIf="responseError" class="alert alert-danger">ERROR! Scooter with id {{responseError?.id}} doesn't exist on DB! Create new one!</p>
+  <p *ngIf="responseError" class="alert alert-danger">ERROR! Scooter with id {{responseError?.id}} doesn't exist on DB! Create a new one!</p>
   <p *ngIf="!formValid && !formInfo.dirty" class="alert alert-danger">ERROR! Please make some changes before Updating to DB!</p>
+  <p *ngIf="!formInfo.valid && formInfo.submitted" class="alert alert-danger">ERROR! Form is not valid. Please chech all fields.</p>
   <form #formInfo="ngForm" action method="GET">
   <h5 *ngIf="scooter !== undefined">Update scooter {{scooter.registration_code}}</h5>
   <table class='table' *ngIf="scooter !== undefined; else noPerson" >
     <thead>
       <tr>
         <th>Name</th>
-        <th>Busy</th>
-        <th>Busy?</th>
+        <th class="checkbox">Busy</th>
         <th>Total Kms</th>
         <th>Plus Kms</th>
         <th>Last use time</th>
@@ -25,16 +25,16 @@ import { ActivatedRoute, Router } from '@angular/router';
     <tbody>
       <tr>
         <td>{{scooter.registration_code}}</td>
-        <td>{{scooter.is_busy ? "true" : "false"}}</td>
-        <td><input type="checkbox" [(ngModel)]="scooter.is_busy" name="is_busy"></td>
+        <td class="checkbox">
+          <i class="fa {{scooter.is_busy ? 'fa-check' : 'fa-battery-full '}}" aria-hidden="true"></i>
+          <input type="checkbox" [(ngModel)]="scooter.is_busy" name="is_busy">
+        </td>
         <td>{{scooter.total_ride_kilometers}}</td>
-        <td><input type="number" ngModel #kmInput="ngModel" name="total_ride_kilometers"></td>
-        <td><input type="datetime-local" ngModel #dateInput="ngModel" name="last_use_time"></td>
+        <td><input type="number" min="0" max="9999" ngModel #kmInput="ngModel" name="total_ride_kilometers"></td>
+        <td><input type="date" [(ngModel)]="scooter.last_use_time" max={{date}} #dateInput="ngModel" name="last_use_time"></td>
       </tr>
     </tbody>
   </table>
-  <p *ngIf="!formInfo.touched && formInfo.submitted" class="alert alert-warning">Form is untuched! Make some changes for saving!</p>
-  <p *ngIf="!formInfo.valid && formInfo.submitted && formInfo.touched" class="alert alert-warning">Form is invalid! Make some changes in red fields for saving!</p>
   <ng-template #noPerson>
     <h5>Create new scooter</h5>
     <table class='table'>
@@ -47,24 +47,33 @@ import { ActivatedRoute, Router } from '@angular/router';
       </thead>
       <tbody>
         <tr>
-          <td><input type="text" #inName="ngModel" maxlength="8" name="registration_code" ngModel required><p *ngIf="inName.invalid && inName.touched" >Name not valid. Use 8 chars please!</p></td>
-          <td><input type="number" min="0" max="9999" #inKm="ngModel" name="total_ride_kilometers" ngModel></td>
-          <td><input type="datetime-local" #inDate="ngModel" name="last_use_time" ngModel></td>
+          <td style="width: 300px;">
+            <input style="width: 100px;"type="text" #inName="ngModel" minlength="8" maxlength="8" name="registration_code" ngModel required>
+            <p *ngIf="inName.invalid && inName.touched" class="alert alert-warning">Use 8 character s please!</p>
+          </td>
+          <td style="width: 300px;">
+            <input type="number" min="0" max="9999" #inKm="ngModel" name="total_ride_kilometers" ngModel>
+            <p *ngIf="inKm.invalid && inKm.touched" class="alert alert-warning">Min - 0, max - 9999 km!</p>
+          </td>
+          <td><input type="date" #inDate="ngModel" name="last_use_time" [(ngModel)]="date" max={{date}}></td>
         </tr>
       </tbody>
     </table>
   </ng-template>
   <div class="delete-edit-btns">
-    <button class="btn btn-outline-dark" (click)="onBack()">Back</button>
+    <button type="button" class="btn btn-outline-dark" (click)="onBack()">Back</button>
     <button *ngIf="!!scooter" type="button" (click)="onDelete(scooter.id)" class="btn btn-outline-danger" >Delete</button>
-    <button *ngIf="!!scooter" type="button" (click)="onUpdate()" class="btn btn-outline-warning">Update</button>
+    <button *ngIf="!!scooter" type="submit" (click)="onUpdate()" class="btn btn-outline-warning">Update</button>
     <button *ngIf="!scooter" type="button" (click)="onCreate()" class="btn btn-outline-success">Save</button>
   </div>
 </form>
   `,
   styles: [
     '.delete-edit-btns { margin-top: 30px; display: flex; justify-content: center; gap: 21px;}',
-    '.ng-invalid:not(form).ng-touched { border: 1px solid salmon;}'
+    '.ng-invalid:not(form).ng-touched { border: 1px solid salmon;}',
+    '.checkbox { width: 70px; padding-left: 20px; padding-right: 20px; }',
+    '.checkbox > input { float: right; margin-top: 7px; }',
+    'p.alert-warning { width: fit-content; margin-top: 10px; }'
   ],
 })
 export class ScooterComponent implements OnInit {
@@ -73,6 +82,7 @@ export class ScooterComponent implements OnInit {
   sub: any;
   formValid: boolean = true;
   responseError: any = '';
+  date: string = new Date().toISOString().slice(0, 10);
 
   scooter2: IScooter = {
     id: 0,
@@ -105,6 +115,7 @@ export class ScooterComponent implements OnInit {
         this._scootersService.getOneScooter(+this.id).subscribe(
           (res) => {
             this.scooter = res[0];
+            this.scooter.last_use_time = this.scooter.last_use_time.slice(0, 10);
           },
           (err) => {
             console.log(err.error);
@@ -124,38 +135,37 @@ export class ScooterComponent implements OnInit {
   }
 
   onCreate() {
-    console.log(new Date().toISOString().slice(0, 10));
-    this.scooter2.registration_code = this.inName.value;
-    this.inKm.value == ''
-      ? (this.scooter2.total_ride_kilometers = 0)
-      : (this.scooter2.total_ride_kilometers = +this.inKm.value);
-    this.inDate.value == ''
-      ? this.scooter2.last_use_time
-      : (this.scooter2.last_use_time = this.inDate.value);
-    this._scootersService.createScooter(this.scooter2).subscribe(
-      (res) => {
-        alert(
-          `Scooter ${this.scooter2.registration_code} successfully created and added to DB!`
-        );
-        this._router.navigate(['/scooters']);
-      },
-      (err) => console.log(err)
-    );
+    if (this.formInfo.valid) {
+      this.scooter2.registration_code = this.inName.value;
+      this.inKm.value == ''
+        ? (this.scooter2.total_ride_kilometers = 0)
+        : (this.scooter2.total_ride_kilometers = +this.inKm.value);
+      this.inDate.value == ''
+        ? this.scooter2.last_use_time
+        : (this.scooter2.last_use_time = this.inDate.value);
+      this._scootersService.createScooter(this.scooter2).subscribe(
+        (res) => {
+          alert(
+            `Scooter ${this.scooter2.registration_code} successfully created and added to DB!`
+          );
+          this._router.navigate(['/scooters']);
+        },
+        (err) => console.log(err)
+      );
+    }
   }
 
   onUpdate(): void {
-    this.scooter.last_use_time =
+    if (this.formInfo.dirty && this.formInfo.valid) {
+      this.scooter.last_use_time =
       this.dateInput.value == ''
         ? new Date().toISOString().slice(0, 10)
         : this.dateInput.value;
-    this.kmInfo.value != ''
-      ? (this.scooter!.total_ride_kilometers += +this.kmInfo.value)
-      : undefined;
-
-    if (this.formInfo.dirty) {
+      this.kmInfo.value != ''
+        ? (this.scooter!.total_ride_kilometers += +this.kmInfo.value)
+        : undefined;
       this._scootersService.updateScooter(this.scooter).subscribe(
         (res) => {
-          console.log(res);
           alert(
             `Scooter ${this.scooter.registration_code} successfully updated!`
           );
@@ -180,9 +190,5 @@ export class ScooterComponent implements OnInit {
         console.log(err);
       }
     );
-  }
-
-  getDate() {
-    return new Date().toISOString().slice(0, 10);
   }
 }
